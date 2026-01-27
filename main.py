@@ -2,20 +2,43 @@ import os
 from dotenv import load_dotenv
 
 from aiogram import Bot, Dispatcher
-from aiogram.filters import Command
+from aiogram.filters import Command, StateFilter
 from aiogram.types import Message
+from aiogram.fsm.context import FSMContext
+from aiogram.fsm import state
+from aiogram.fsm.state import default_state, State, StatesGroup
 
 
 load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN")
+ADMINS = {1236189462, 349271997}
 
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
 
-@dp.message(Command(commands="start"))
+class FSMFillForm(StatesGroup):
+    fill_link = State()
+
+
+@dp.message(Command(commands="start"), StateFilter(default_state))
 async def process_start_command(message: Message):
     await message.answer('Здравствуйте! Убедитесь, что мы правильно распознали ваше имя: Имя1')
 
+
+@dp.message(Command(commands="add_link"), StateFilter(default_state))
+async def add_link_command(message: Message, state: FSMContext):
+    if message.from_user.id not in ADMINS:
+        await message.answer("У вас нет доступа к этой команде!")
+
+    await message.answer("Введите ссылку на следующее голосование в гугл формах:")
+    await state.set_state(FSMFillForm.fill_link)
+
+@dp.message(StateFilter(FSMFillForm.fill_link))
+async def process_name_sent(message: Message, state: FSMContext):
+    # Cохраняем введенное имя в хранилище по ключу "name"
+    await state.update_data(name=message.text)
+    await message.answer('Ссылка сохранена ' + message.text)
+    # Устанавливаем состояние ожидания ввода возраста
 
 if __name__ == '__main__':
     dp.run_polling(bot)
