@@ -22,16 +22,16 @@ class FSMFillForm(StatesGroup):
 
 @dp.message(Command(commands="start"), StateFilter(default_state))
 async def process_start_command(message: Message):
-    await message.answer('Здравствуйте! Убедитесь, что мы правильно распознали ваше имя: Имя1')
+    await message.answer('Здравствуйте! Убедитесь, что ваше имя было правильно распознанно: Имя1')
 
 
 @dp.message(Command(commands="add_link"), StateFilter(default_state))
 async def add_link_command(message: Message, state: FSMContext):
     if message.from_user.id not in ADMINS:
         await message.answer("У вас нет доступа к этой команде!")
-
-    await message.answer("Введите ссылку на следующее голосование в гугл формах:")
-    await state.set_state(FSMFillForm.fill_link)
+    else:
+        await message.answer("Введите ссылку на следующее голосование в гугл формах:")
+        await state.set_state(FSMFillForm.fill_link)
 
 @dp.message(StateFilter(FSMFillForm.fill_link))
 async def process_name_sent(message: Message, state: FSMContext):
