@@ -7,7 +7,7 @@ from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm import state
 from aiogram.fsm.state import default_state, State, StatesGroup
-
+from oauthlib.uri_validate import userinfo
 
 load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN")
@@ -22,7 +22,7 @@ class FSMFillForm(StatesGroup):
 
 @dp.message(Command(commands="start"), StateFilter(default_state))
 async def process_start_command(message: Message):
-    await message.answer('Здравствуйте! Убедитесь, что ваше имя было правильно распознанно: Имя1')
+    await message.answer(f'Здравствуйте! Убедитесь, что ваше имя было правильно распознанно: {message.from_user.username}')
 
 
 @dp.message(Command(commands="add_link"), StateFilter(default_state))
