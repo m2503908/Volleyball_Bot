@@ -8,7 +8,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm import state
 from aiogram.fsm.state import default_state, State, StatesGroup
 
-from work_with_users_data import add_user, check_user
+from work_with_users_data import add_user, check_username
 
 load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN")
@@ -26,7 +26,7 @@ class FSMFill(StatesGroup):
 @dp.message(Command(commands="start"), StateFilter(default_state))
 async def process_start_command(message: Message):
     user_username = message.from_user.username
-    user_surname, user_name = check_user(user_username)
+    user_surname, user_name = check_username(user_username)
     if user_name:
         await message.answer(
             f'Здравствуйте! Убедитесь, что ваше имя было правильно распознанно:\n{user_surname} {user_name} \n\n'
