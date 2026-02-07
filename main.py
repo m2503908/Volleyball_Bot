@@ -7,7 +7,6 @@ from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm import state
 from aiogram.fsm.state import default_state, State, StatesGroup
-from oauthlib.uri_validate import userinfo
 
 load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN")
