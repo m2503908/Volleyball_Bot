@@ -18,8 +18,9 @@ bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
 
 
-class FSMFillForm(StatesGroup):
+class FSMFill(StatesGroup):
     fill_link = State()
+    fill_name = State()
 
 
 @dp.message(Command(commands="start"), StateFilter(default_state))
@@ -34,19 +35,32 @@ async def process_start_command(message: Message):
         await message.answer(f'Здравствуйте! Перед началом работы воспользуйтесь командой /register')
 
 
+@dp.message(Command(commands='register'), StateFilter(default_state))
+async def register_command(message: Message, state: FSMContext):
+    await message.answer("Введите имя в формате Фамилия Имя. \n\nПример: \nИванов Иван")
+    await state.set_state(FSMFill.fill_name)
+
+
+@dp.message(StateFilter(FSMFill.fill_name))
+async def process_register(message: Message, state: FSMContext):
+    await state.update_data(name=message.text)
+    user_surname, user_name = message.text.split(' ')
+    await message.answer(f"Ваши фамилия и имя: {user_surname} {user_name}")
+
+
 @dp.message(Command(commands="add_link"), StateFilter(default_state))
 async def add_link_command(message: Message, state: FSMContext):
     if message.from_user.id not in ADMINS:
         await message.answer("У вас нет доступа к этой команде!")
     else:
         await message.answer("Введите ссылку на следующее голосование в гугл формах:")
-        await state.set_state(FSMFillForm.fill_link)
+        await state.set_state(FSMFill.fill_link)
 
 
-@dp.message(StateFilter(FSMFillForm.fill_link))
-async def process_name_sent(message: Message, state: FSMContext):
+@dp.message(StateFilter(FSMFill.fill_link))
+async def process_add_link(message: Message, state: FSMContext):
     # Cохраняем введенное имя в хранилище по ключу "name"
-    await state.update_data(name=message.text)
+    await state.update_data(link=message.text)
     await message.answer('Ссылка сохранена ' + message.text)
     # Устанавливаем состояние ожидания ввода возраста
 
