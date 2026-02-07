@@ -10,11 +10,11 @@ def init_db():
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT UNIQUE,
+        username TEXT,
         surname TEXT,
         name TEXT,
         telegram_id INTEGER UNIQUE,
-        subscribe INTEGER DEFAULT 1,
+        subscribe INTEGER DEFAULT 0,
         admin INTEGER DEFAULT 0
     )
     """)

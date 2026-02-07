@@ -1,41 +1,102 @@
-import csv
+import sqlite3
+from create_database import DB_PATH
 
-def add_user(username, surname, name, telegram_id, subscribe=1, admin=0):
-    with open('users_data.csv', newline='', mode='a') as f:
-        writer = csv.writer(f, delimiter=';')
-        writer.writerow([username, surname, name, telegram_id, subscribe, admin])
+
+def add_user(username, surname, name, telegram_id, subscribe=0, admin=0):
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute("""
+            INSERT INTO users (username, surname, name, telegram_id, subscribe, admin)
+            VALUES (?, ?, ?, ?, ?, ?)
+        """, (username, surname, name, telegram_id, subscribe, admin))
+
+        conn.commit()
+        return True
+
+    except sqlite3.IntegrityError:
+        # username или telegram_id уже существует
+        return False
+
+    finally:
+        conn.close()
 
 
 def check_username(username):
-    with open('users_data.csv') as f:
-        reader = csv.DictReader(f, delimiter=';')
-        for row in reader:
-            if row['username'] == username:
-                return row['surname'], row['name']
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT surname, name
+        FROM users
+        WHERE username = ?
+    """, (username,))
+
+    result = cursor.fetchone()
+    conn.close()
+
+    if result:
+        return result[0], result[1]
+
     return None, None
 
 
 def check_surname_name(surname, name):
-    with open('users_data.csv') as f:
-        reader = csv.DictReader(f, delimiter=';')
-        for row in reader:
-            if row['surname'] == surname and row['name'] == name:
-                return row['username']
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT username
+        FROM users
+        WHERE surname = ? AND name = ?
+    """, (surname, name))
+
+    result = cursor.fetchone()
+    conn.close()
+
+    if result:
+        return result[0]
+
     return None
 
 
 def update_username(surname, name, new_username):
-    with open('users_data.csv') as f:
-        reader = csv.DictReader(f, delimiter=';')
-        for row in reader:
-            if row['surname'] == surname and row['name'] == name:
-                row['username'] = new_username
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute("""
+            UPDATE users
+            SET username = ?
+            WHERE surname = ? AND name = ?
+        """, (new_username, surname, name))
+
+        conn.commit()
+        updated = cursor.rowcount > 0
+
+    except sqlite3.IntegrityError:
+        # новый username уже занят
+        return False
+
+    finally:
+        conn.close()
+
+    return updated
 
 
 def update_surname_name(new_surname, new_name, username):
-    with open('users_data.csv') as f:
-        reader = csv.DictReader(f, delimiter=';')
-        for row in reader:
-            if row['username'] == username:
-                row['surname'] = new_surname
-                row['name'] = new_name
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        UPDATE users
+        SET surname = ?, name = ?
+        WHERE username = ?
+    """, (new_surname, new_name, username))
+
+    conn.commit()
+    updated = cursor.rowcount > 0
+    conn.close()
+
+    return updated

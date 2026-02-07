@@ -74,5 +74,5 @@ async def process_add_link(message: Message, state: FSMContext):
 
 
 if __name__ == '__main__':
-    dp.run_polling(bot)
     init_db()
+    dp.run_polling(bot)
