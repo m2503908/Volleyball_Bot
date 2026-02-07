@@ -9,6 +9,7 @@ from aiogram.fsm import state
 from aiogram.fsm.state import default_state, State, StatesGroup
 
 from work_with_users_data import add_user, check_username, check_surname_name, update_username, update_surname_name
+from create_database import init_db
 
 load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN")
@@ -74,3 +75,4 @@ async def process_add_link(message: Message, state: FSMContext):
 
 if __name__ == '__main__':
     dp.run_polling(bot)
+    init_db()
