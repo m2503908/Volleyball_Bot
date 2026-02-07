@@ -8,6 +8,8 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm import state
 from aiogram.fsm.state import default_state, State, StatesGroup
 
+from work_with_users_data import add_user, check_user
+
 load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 ADMINS = {1236189462, 349271997}
@@ -15,13 +17,21 @@ ADMINS = {1236189462, 349271997}
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
 
+
 class FSMFillForm(StatesGroup):
     fill_link = State()
 
 
 @dp.message(Command(commands="start"), StateFilter(default_state))
 async def process_start_command(message: Message):
-    await message.answer(f'Здравствуйте! Убедитесь, что ваше имя было правильно распознанно: {message.from_user.username}')
+    user_username = message.from_user.username
+    user_surname, user_name = check_user(user_username)
+    if user_name:
+        await message.answer(
+            f'Здравствуйте! Убедитесь, что ваше имя было правильно распознанно:\n{user_surname} {user_name} \n\n'
+            f'Если имя (или фамилия) распознаны неверно, то воспользуйтесь следующей командой: \n/register')
+    else:
+        await message.answer(f'Здравствуйте! Перед началом работы воспользуйтесь командой /register')
 
 
 @dp.message(Command(commands="add_link"), StateFilter(default_state))
@@ -32,12 +42,14 @@ async def add_link_command(message: Message, state: FSMContext):
         await message.answer("Введите ссылку на следующее голосование в гугл формах:")
         await state.set_state(FSMFillForm.fill_link)
 
+
 @dp.message(StateFilter(FSMFillForm.fill_link))
 async def process_name_sent(message: Message, state: FSMContext):
     # Cохраняем введенное имя в хранилище по ключу "name"
     await state.update_data(name=message.text)
     await message.answer('Ссылка сохранена ' + message.text)
     # Устанавливаем состояние ожидания ввода возраста
+
 
 if __name__ == '__main__':
     dp.run_polling(bot)
