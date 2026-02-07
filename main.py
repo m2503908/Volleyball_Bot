@@ -8,7 +8,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm import state
 from aiogram.fsm.state import default_state, State, StatesGroup
 
-from work_with_users_data import add_user, check_username
+from work_with_users_data import add_user, check_username, check_surname_name, update_username, update_surname_name
 
 load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN")
@@ -45,7 +45,16 @@ async def register_command(message: Message, state: FSMContext):
 async def process_register(message: Message, state: FSMContext):
     await state.update_data(name=message.text)
     user_surname, user_name = message.text.split(' ')
-    await message.answer(f"Ваши фамилия и имя: {user_surname} {user_name}")
+    user_username = check_surname_name(user_surname, user_name)
+    if user_username:
+        update_username(user_surname, user_name, user_username)
+        print("PAM PAM", user_surname, user_name, message.from_user.username)
+    else:
+        if check_username(message.from_user.username)[0]:
+            update_surname_name(user_surname, user_name, message.from_user.username)
+            print("PIM PIM")
+        else:
+            add_user(message.from_user.username, user_surname, user_name, message.from_user.id, subscribe=0)
 
 
 @dp.message(Command(commands="add_link"), StateFilter(default_state))
@@ -59,10 +68,8 @@ async def add_link_command(message: Message, state: FSMContext):
 
 @dp.message(StateFilter(FSMFill.fill_link))
 async def process_add_link(message: Message, state: FSMContext):
-    # Cохраняем введенное имя в хранилище по ключу "name"
     await state.update_data(link=message.text)
     await message.answer('Ссылка сохранена ' + message.text)
-    # Устанавливаем состояние ожидания ввода возраста
 
 
 if __name__ == '__main__':
