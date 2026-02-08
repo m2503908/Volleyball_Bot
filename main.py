@@ -11,6 +11,7 @@ from aiogram.fsm.state import default_state, State, StatesGroup
 from work_with_users_data import add_user, check_username, check_surname_name, update_username, update_surname_name, find_admin
 from create_database import init_db
 
+init_db()
 load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 ADMINS = find_admin()
@@ -75,6 +76,13 @@ async def process_add_link(message: Message, state: FSMContext):
     await state.clear()
 
 
+@dp.message(Command(commands="add_subscribe"), StateFilter(default_state))
+async def add_subscribe_command(message: Message, state: FSMContext):
+    if message.from_user.id not in ADMINS:
+        await message.answer("У вас нет доступа к этой команде!")
+    else:
+        pass
+
+
 if __name__ == '__main__':
-    init_db()
     dp.run_polling(bot)
