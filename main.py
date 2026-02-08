@@ -3,12 +3,12 @@ from dotenv import load_dotenv
 
 from aiogram import Bot, Dispatcher
 from aiogram.filters import Command, StateFilter
-from aiogram.types import Message
+from aiogram.types import Message, InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm import state
 from aiogram.fsm.state import default_state, State, StatesGroup
 
-from work_with_users_data import add_user, check_username, check_surname_name, update_username, update_surname_name, find_admin
+from work_with_users_data import add_user, check_username, check_surname_name, update_username, update_surname_name, find_admin, get_surname_name
 from create_database import init_db
 
 init_db()
@@ -23,6 +23,7 @@ dp = Dispatcher()
 class FSMFill(StatesGroup):
     fill_link = State()
     fill_name = State()
+    fill_surname = State()
 
 
 @dp.message(Command(commands="start"), StateFilter(default_state))
@@ -76,13 +77,34 @@ async def process_add_link(message: Message, state: FSMContext):
     await state.clear()
 
 
+def surname_name_keyboard(surnames_names):
+    keyboard = []
+
+    for surname_name in surnames_names:
+        keyboard.append([
+            InlineKeyboardButton(
+                text=surname_name,
+                callback_data=surname_name
+            )
+        ])
+
+    return InlineKeyboardMarkup(inline_keyboard=keyboard)
+
+
 @dp.message(Command(commands="add_subscribe"), StateFilter(default_state))
 async def add_subscribe_command(message: Message, state: FSMContext):
     if message.from_user.id not in ADMINS:
         await message.answer("У вас нет доступа к этой команде!")
     else:
-        pass
+        surnames_names = get_surname_name()
+        await state.set_state(FSMFill.fill_surname)
+        await message.answer("Выберите фамилию пользователя, которому хотите добавить абонимент:", reply_markup=surname_name_keyboard(surnames_names))
 
+
+@dp.callback_query(StateFilter(FSMFill.fill_surname))
+async def process_add_subscribe(callback: CallbackQuery, state: FSMContext):
+    await callback.message.edit_text(f"Вы выбрали фамилию: {callback.data}")
+    await state.clear()
 
 if __name__ == '__main__':
     dp.run_polling(bot)
