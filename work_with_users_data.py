@@ -53,7 +53,7 @@ def get_surname_name():
     result = cursor.fetchall()
     conn.close()
 
-    return result
+    return [row[0] + ' ' + row[1] for row in result]
 
 
 def check_username(username):
