@@ -98,7 +98,7 @@ async def add_subscribe_command(message: Message, state: FSMContext):
     else:
         surnames_names = get_surname_name()
         await state.set_state(FSMFill.fill_surname)
-        await message.answer("Выберите фамилию пользователя, которому хотите добавить абонимент:", reply_markup=surname_name_keyboard(surnames_names))
+        await message.answer("Выберите фамилию и имя пользователя, которому хотите добавить абонимент:", reply_markup=surname_name_keyboard(surnames_names))
 
 
 @dp.callback_query(StateFilter(FSMFill.fill_surname))
