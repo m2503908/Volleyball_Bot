@@ -49,13 +49,14 @@ async def process_register(message: Message, state: FSMContext):
     user_username = check_surname_name(user_surname, user_name)
     if user_username:
         update_username(user_surname, user_name, user_username)
-        print("PAM PAM", user_surname, user_name, message.from_user.username)
+        #print("PAM PAM", user_surname, user_name, message.from_user.username)
     else:
         if check_username(message.from_user.username)[0]:
             update_surname_name(user_surname, user_name, message.from_user.username)
-            print("PIM PIM")
+            #print("PIM PIM")
         else:
             add_user(message.from_user.username, user_surname, user_name, message.from_user.id, subscribe=0)
+    await state.clear()
 
 
 @dp.message(Command(commands="add_link"), StateFilter(default_state))
@@ -71,6 +72,7 @@ async def add_link_command(message: Message, state: FSMContext):
 async def process_add_link(message: Message, state: FSMContext):
     await state.update_data(link=message.text)
     await message.answer('Ссылка сохранена ' + message.text)
+    await state.clear()
 
 
 if __name__ == '__main__':
