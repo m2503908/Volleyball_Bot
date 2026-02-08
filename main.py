@@ -21,7 +21,8 @@ dp = Dispatcher()
 
 
 class FSMFill(StatesGroup):
-    fill_link = State()
+    fill_link1 = State()
+    fill_link2 = State()
     fill_name = State()
     fill_surname = State()
 
@@ -67,13 +68,22 @@ async def add_link_command(message: Message, state: FSMContext):
         await message.answer("У вас нет доступа к этой команде!")
     else:
         await message.answer("Введите ссылку на следующее голосование в гугл формах:")
-        await state.set_state(FSMFill.fill_link)
+        await state.set_state(FSMFill.fill_link1)
 
 
-@dp.message(StateFilter(FSMFill.fill_link))
-async def process_add_link(message: Message, state: FSMContext):
-    await state.update_data(link=message.text)
-    await message.answer('Ссылка сохранена ' + message.text)
+@dp.message(StateFilter(FSMFill.fill_link1))
+async def process_add_link1(message: Message, state: FSMContext):
+    await state.update_data(link1=message.text)
+    #await message.answer('Ссылка сохранена ' + message.text)
+    await message.answer(f'Ссылка на гугл форму сохранена! {message.text} \n\nТеперь вставьте ссылку на таблицу с ответами для этой формы:')
+    await state.clear()
+    await state.set_state(FSMFill.fill_link2)
+
+@dp.message(StateFilter(FSMFill.fill_link2))
+async def process_add_link2(message: Message, state: FSMContext):
+    await state.update_data(link2=message.text)
+    #await message.answer('Ссылка сохранена ' + message.text)
+    await message.answer(f'Ссылка на ответы сохранена! {message.text}')
     await state.clear()
 
 
