@@ -39,6 +39,23 @@ def find_admin():
     return [row[0] for row in result]
 
 
+def get_surname_name():
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT surname, name
+        FROM users
+        WHERE surname IS NOT NULL
+          AND name IS NOT NULL
+    """)
+
+    result = cursor.fetchall()
+    conn.close()
+
+    return result
+
+
 def check_username(username):
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
