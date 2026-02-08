@@ -8,12 +8,13 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm import state
 from aiogram.fsm.state import default_state, State, StatesGroup
 
-from work_with_users_data import add_user, check_username, check_surname_name, update_username, update_surname_name
+from work_with_users_data import add_user, check_username, check_surname_name, update_username, update_surname_name, find_admin
 from create_database import init_db
 
+init_db()
 load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN")
-ADMINS = {1236189462, 349271997}
+ADMINS = find_admin()
 
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
@@ -49,13 +50,14 @@ async def process_register(message: Message, state: FSMContext):
     user_username = check_surname_name(user_surname, user_name)
     if user_username:
         update_username(user_surname, user_name, user_username)
-        print("PAM PAM", user_surname, user_name, message.from_user.username)
+        #print("PAM PAM", user_surname, user_name, message.from_user.username)
     else:
         if check_username(message.from_user.username)[0]:
             update_surname_name(user_surname, user_name, message.from_user.username)
-            print("PIM PIM")
+            #print("PIM PIM")
         else:
             add_user(message.from_user.username, user_surname, user_name, message.from_user.id, subscribe=0)
+    await state.clear()
 
 
 @dp.message(Command(commands="add_link"), StateFilter(default_state))
@@ -71,8 +73,16 @@ async def add_link_command(message: Message, state: FSMContext):
 async def process_add_link(message: Message, state: FSMContext):
     await state.update_data(link=message.text)
     await message.answer('Ссылка сохранена ' + message.text)
+    await state.clear()
+
+
+@dp.message(Command(commands="add_subscribe"), StateFilter(default_state))
+async def add_subscribe_command(message: Message, state: FSMContext):
+    if message.from_user.id not in ADMINS:
+        await message.answer("У вас нет доступа к этой команде!")
+    else:
+        pass
 
 
 if __name__ == '__main__':
-    init_db()
     dp.run_polling(bot)
