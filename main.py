@@ -59,6 +59,7 @@ async def process_register(message: Message, state: FSMContext):
             #print("PIM PIM")
         else:
             add_user(message.from_user.username, user_surname, user_name, message.from_user.id, subscribe=0)
+    await message.answer("Регистрация прошла успешно! Ожидайте ссылку на google-форму!")
     await state.clear()
 
 
