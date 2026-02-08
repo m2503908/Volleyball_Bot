@@ -103,7 +103,7 @@ async def add_subscribe_command(message: Message, state: FSMContext):
 
 @dp.callback_query(StateFilter(FSMFill.fill_surname))
 async def process_add_subscribe(callback: CallbackQuery, state: FSMContext):
-    await callback.message.edit_text(f"Вы выбрали фамилию: {callback.data}")
+    await callback.message.edit_text(f"Вы выбрали: {callback.data}. Абонимент успешно добавлен!")
     await state.clear()
 
 if __name__ == '__main__':
