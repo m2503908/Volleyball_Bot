@@ -23,6 +23,22 @@ def add_user(username, surname, name, telegram_id, subscribe=0, admin=0):
         conn.close()
 
 
+def find_admin():
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT telegram_id
+        FROM users
+        WHERE admin = 1
+    """)
+
+    result = cursor.fetchall()
+    conn.close()
+
+    return [row[0] for row in result]
+
+
 def check_username(username):
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
