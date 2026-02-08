@@ -8,7 +8,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm import state
 from aiogram.fsm.state import default_state, State, StatesGroup
 
-from work_with_users_data import add_user, check_username, check_surname_name, update_username, update_surname_name, find_admin, get_surname_name
+from work_with_users_data import *
 from create_database import init_db
 
 init_db()
@@ -114,6 +114,7 @@ async def add_subscribe_command(message: Message, state: FSMContext):
 
 @dp.callback_query(StateFilter(FSMFill.fill_surname))
 async def process_add_subscribe(callback: CallbackQuery, state: FSMContext):
+    give_subscribe(callback.data)
     await callback.message.edit_text(f"Вы выбрали: {callback.data}. Абонимент успешно добавлен!")
     await state.clear()
 
