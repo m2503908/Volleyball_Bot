@@ -8,12 +8,12 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm import state
 from aiogram.fsm.state import default_state, State, StatesGroup
 
-from work_with_users_data import add_user, check_username, check_surname_name, update_username, update_surname_name
+from work_with_users_data import add_user, check_username, check_surname_name, update_username, update_surname_name, find_admin
 from create_database import init_db
 
 load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN")
-ADMINS = {1236189462, 349271997}
+ADMINS = find_admin()
 
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
