@@ -135,22 +135,20 @@ def update_surname_name(new_surname, new_name, username):
     return updated
 
 
-def give_subscribe(surname_name: str):
+def give_subscribe(surname_name: str, role, flag):
     surname, name = surname_name.split()
 
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
-    cursor.execute("""
+    cursor.execute(f"""
         UPDATE users
-        SET subscribe = 1
+        SET {role} = ?
         WHERE surname = ? AND name = ?
-    """, (surname, name))
+    """, (flag, surname, name))
 
     conn.commit()
     updated = cursor.rowcount > 0
     conn.close()
 
     return updated
-
-print(1)
