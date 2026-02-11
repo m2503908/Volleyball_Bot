@@ -25,6 +25,8 @@ class FSMFill(StatesGroup):
     fill_link2 = State()
     fill_name = State()
     fill_surname = State()
+    fill_role = State()
+    fill_flag = State()
 
 
 @dp.message(Command(commands="start"), StateFilter(default_state))
@@ -88,33 +90,67 @@ async def process_add_link2(message: Message, state: FSMContext):
     await state.clear()
 
 
-def surname_name_keyboard(surnames_names):
+def surname_name_keyboard(surnames_names, role):
     keyboard = []
 
     for surname_name in surnames_names:
         keyboard.append([
             InlineKeyboardButton(
                 text=surname_name,
-                callback_data=surname_name
+                callback_data=f"{surname_name} {role}"
             )
         ])
 
     return InlineKeyboardMarkup(inline_keyboard=keyboard)
 
 
-@dp.message(Command(commands="add_subscribe"), StateFilter(default_state))
-async def add_subscribe_command(message: Message, state: FSMContext):
+@dp.message(Command(commands="change_rights"), StateFilter(default_state))
+async def change_rights_command(message: Message, state: FSMContext):
     if message.from_user.id not in ADMINS:
         await message.answer("У вас нет доступа к этой команде!")
     else:
-        surnames_names = get_surname_name()
-        await state.set_state(FSMFill.fill_surname)
-        await message.answer("Выберите фамилию и имя пользователя, которому хотите добавить абонимент:", reply_markup=surname_name_keyboard(surnames_names))
+        #surnames_names = get_surname_name()
+        keyboard = [
+            [InlineKeyboardButton(
+                text="Админ",
+                callback_data="admin"
+            )],
+            [InlineKeyboardButton(
+                text="Абонимент",
+                callback_data="subscribe"
+            )]
+        ]
+        await state.set_state(FSMFill.fill_role)
+        await message.answer("Выберите какую роль вы хотите добавить/убрать:", reply_markup=InlineKeyboardMarkup(inline_keyboard=keyboard))
+        #await message.answer("Выберите фамилию и имя пользователя, которому хотите добавить абонимент:", reply_markup=surname_name_keyboard(surnames_names))
 
+
+@dp.callback_query(StateFilter(FSMFill.fill_role))
+async def process_change_rights1(callback: CallbackQuery, state: FSMContext):
+    keyboard = [
+        [InlineKeyboardButton(
+            text="Добавить роль",
+            callback_data=f"{callback.data} 1"
+        )],
+        [InlineKeyboardButton(
+            text="Убрать роль",
+            callback_data=f"{callback.data} 0"
+        )]
+    ]
+    await state.set_state(FSMFill.fill_flag)
+    await callback.message.edit_text("Выберите что вы хотите сделать с ролью: добавить или убрать", reply_markup=InlineKeyboardMarkup(inline_keyboard=keyboard))
+
+
+@dp.callback_query(StateFilter(FSMFill.fill_flag))
+async def process_change_rights2(callback: CallbackQuery, state: FSMContext):
+    surnames_names = get_surname_name()
+    await callback.message.edit_text("Выберите фамилию и имя пользователя, которому хотите добавить роль:", reply_markup=surname_name_keyboard(surnames_names, callback.data))
+    await state.set_state(FSMFill.fill_surname)
 
 @dp.callback_query(StateFilter(FSMFill.fill_surname))
-async def process_add_subscribe(callback: CallbackQuery, state: FSMContext):
-    give_subscribe(callback.data)
+async def process_change_rights3(callback: CallbackQuery, state: FSMContext):
+    surname, name, role = callback.data.split()
+    give_subscribe(surname, name, role)
     await callback.message.edit_text(f"Вы выбрали: {callback.data}. Абонимент успешно добавлен!")
     await state.clear()
 
