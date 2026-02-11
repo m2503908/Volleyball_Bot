@@ -135,8 +135,7 @@ def update_surname_name(new_surname, new_name, username):
     return updated
 
 
-def give_subscribe(surname_name: str, role, flag):
-    surname, name = surname_name.split()
+def change_rights(surname: str, name: str, role, flag):
 
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
