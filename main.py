@@ -149,8 +149,8 @@ async def process_change_rights2(callback: CallbackQuery, state: FSMContext):
 
 @dp.callback_query(StateFilter(FSMFill.fill_surname))
 async def process_change_rights3(callback: CallbackQuery, state: FSMContext):
-    surname, name, role = callback.data.split()
-    change_rights(surname, name, role)
+    surname, name, role, flag = callback.data.split()
+    change_rights(surname, name, role, flag)
     await callback.message.edit_text(f"Вы выбрали: {callback.data}. Абонимент успешно добавлен!")
     await state.clear()
 
