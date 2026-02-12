@@ -94,6 +94,22 @@ def check_surname_name(surname, name):
     return None
 
 
+def get_id_by_name(surname, name):
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT telegram_id
+        FROM users
+        WHERE surname = ? AND name = ?
+    """, (surname, name))
+
+    result = cursor.fetchone()
+    conn.close()
+
+    return result[0]
+
+
 def update_username(surname, name, new_username):
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
