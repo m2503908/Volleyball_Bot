@@ -80,14 +80,14 @@ async def process_add_link1(message: Message, state: FSMContext):
     #await message.answer('Ссылка сохранена ' + message.text)
     await message.answer(f'Ссылка на гугл форму сохранена! {message.text} \n\nТеперь вставьте ссылку на таблицу с ответами для этой формы:')
     await state.clear()
-    await state.set_state(FSMFill.fill_link2)
+    #await state.set_state(FSMFill.fill_link2)
 
-@dp.message(StateFilter(FSMFill.fill_link2))
+"""@dp.message(StateFilter(FSMFill.fill_link2))
 async def process_add_link2(message: Message, state: FSMContext):
     await state.update_data(link2=message.text)
     #await message.answer('Ссылка сохранена ' + message.text)
     await message.answer(f'Ссылка на ответы сохранена! {message.text}')
-    await state.clear()
+    await state.clear()"""
 
 
 def surname_name_keyboard(surnames_names, role):
