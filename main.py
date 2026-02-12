@@ -151,7 +151,7 @@ async def process_change_rights2(callback: CallbackQuery, state: FSMContext):
 async def process_change_rights3(callback: CallbackQuery, state: FSMContext):
     surname, name, role, flag = callback.data.split()
     change_rights(surname, name, role, flag)
-    await callback.message.edit_text(f"Вы выбрали: {callback.data}. Абонимент успешно добавлен!")
+    await callback.message.edit_text(f"Вы выбрали: {surname} {name}. \nРоль {'"Админ"' if role == 'admin' else '"Абонимент"'} {'добавлена' if flag else 'удалена'} для этого пользователя.")
     await state.clear()
 
 if __name__ == '__main__':
