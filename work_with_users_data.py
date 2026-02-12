@@ -23,6 +23,19 @@ def add_user(username, surname, name, telegram_id, subscribe=0, admin=0):
         conn.close()
 
 
+def add_link_db(date, link):
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        INSERT INTO links (date, link) 
+        VALUES (?, ?)
+    """, (date, link))
+
+    conn.commit()
+    conn.close()
+
+
 def find_admin():
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
