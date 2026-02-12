@@ -21,11 +21,10 @@ def init_db():
 
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS links (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            date TEXT,
-            form_link TEXT,
-            table_link TEXT
-        )
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        date TEXT,
+        form_link TEXT
+    )
     """)
 
     conn.commit()
