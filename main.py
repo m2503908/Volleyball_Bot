@@ -151,8 +151,13 @@ async def process_change_rights2(callback: CallbackQuery, state: FSMContext):
 async def process_change_rights3(callback: CallbackQuery, state: FSMContext):
     surname, name, role, flag = callback.data.split()
     change_rights(surname, name, role, flag)
-    await callback.message.edit_text(f"Вы выбрали: {surname} {name}. \nРоль {'"Админ"' if role == 'admin' else '"Абонимент"'} {'добавлена' if flag else 'удалена'} для этого пользователя.")
-    await state.clear()
+    try:
+        await bot.send_message(chat_id=get_id_by_name(surname, name), text=f"Ваши права изменены! \nВам {'добавили' if flag == "1" else 'удалили'} роль {'"Админ"' if role == 'admin' else '"Абонимент"'}!")
+        await callback.message.edit_text(
+            f"Вы выбрали: {surname} {name}. \nРоль {'"Админ"' if role == 'admin' else '"Абонимент"'} {'добавлена' if flag == "1" else 'удалена'} для этого пользователя.")
+    except Exception:
+        await callback.message.edit_text(f"Пользователь {surname} {name} заблокировал бота, но изменения прошли успешно и нужные данные зафиксированы в базе данных.")
+
 
 if __name__ == '__main__':
     dp.run_polling(bot)
