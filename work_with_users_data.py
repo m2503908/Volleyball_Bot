@@ -29,7 +29,7 @@ def add_link_db(date, link, friday, saturday):
 
     cursor.execute("""
         INSERT INTO links (date, form_link, friday, saturday) 
-        VALUES (?, ?)
+        VALUES (?, ?, ?, ?)
     """, (date, link, friday, saturday))
 
     conn.commit()
