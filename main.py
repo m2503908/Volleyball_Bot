@@ -74,7 +74,7 @@ async def process_register(message: Message, state: FSMContext):
             update_surname_name(user_surname, user_name, message.from_user.username)
             #print("PIM PIM")
         else:
-            add_user(message.from_user.username, user_surname, user_name, message.from_user.id, subscribe=0) # добавляем пользователя в бд
+            add_user(message.from_user.username, user_surname, user_name, message.from_user.id) # добавляем юзера в бд
     await message.answer("Регистрация прошла успешно! Ожидайте ссылку на google-форму!")
     await state.clear()
 
@@ -147,8 +147,10 @@ async def change_rights_command(message: Message, state: FSMContext):
             )]
         ]
         await state.set_state(FSMFill.fill_role)
-        await message.answer("Выберите какую роль вы хотите добавить/убрать:", reply_markup=InlineKeyboardMarkup(inline_keyboard=keyboard))
-        #await message.answer("Выберите фамилию и имя пользователя, которому хотите добавить абонимент:", reply_markup=surname_name_keyboard(surnames_names))
+        await message.answer("Выберите какую роль вы хотите добавить/убрать:",
+                             reply_markup=InlineKeyboardMarkup(inline_keyboard=keyboard))
+        #await message.answer("Выберите фамилию и имя пользователя, которому хотите добавить абонимент:",
+        # reply_markup=surname_name_keyboard(surnames_names))
 
 
 # вспомогательная функция для изменения прав пользователя
@@ -165,14 +167,16 @@ async def process_change_rights1(callback: CallbackQuery, state: FSMContext):
         )]
     ]
     await state.set_state(FSMFill.fill_flag)
-    await callback.message.edit_text("Выберите что вы хотите сделать с ролью: добавить или убрать", reply_markup=InlineKeyboardMarkup(inline_keyboard=keyboard))
+    await callback.message.edit_text("Выберите что вы хотите сделать с ролью: добавить или убрать",
+                                     reply_markup=InlineKeyboardMarkup(inline_keyboard=keyboard))
 
 
 # вспомогательная функция для изменения прав пользователя
 @dp.callback_query(StateFilter(FSMFill.fill_flag))
 async def process_change_rights2(callback: CallbackQuery, state: FSMContext):
     surnames_names = get_surname_name()
-    await callback.message.edit_text("Выберите фамилию и имя пользователя, которому хотите добавить роль:", reply_markup=surname_name_keyboard(surnames_names, callback.data))
+    await callback.message.edit_text("Выберите фамилию и имя пользователя, которому хотите добавить роль:",
+                                     reply_markup=surname_name_keyboard(surnames_names, callback.data))
     await state.set_state(FSMFill.fill_surname)
 
 
@@ -182,11 +186,15 @@ async def process_change_rights3(callback: CallbackQuery, state: FSMContext):
     surname, name, role, flag = callback.data.split()
     change_rights(surname, name, role, flag)
     try: # используем try except на случай, если пользователь заблокировал бота
-        await bot.send_message(chat_id=get_id_by_name(surname, name), text=f"Ваши права изменены! \nВам {'добавили' if flag == "1" else 'удалили'} роль {'"Админ"' if role == 'admin' else '"Абонимент"'}!")
+        await bot.send_message(chat_id=get_id_by_name(surname, name),
+                               text=f"Ваши права изменены! \nВам {'добавили' if flag == "1" else 'удалили'} роль "
+                                    f"{'"Админ"' if role == 'admin' else '"Абонимент"'}!")
         await callback.message.edit_text(
-            f"Вы выбрали: {surname} {name}. \nРоль {'"Админ"' if role == 'admin' else '"Абонимент"'} {'добавлена' if flag == "1" else 'удалена'} для этого пользователя.")
+            f"Вы выбрали: {surname} {name}. \nРоль {'"Админ"' if role == 'admin' else '"Абонимент"'} "
+            f"{'добавлена' if flag == "1" else 'удалена'} для этого пользователя.")
     except Exception:
-        await callback.message.edit_text(f"Пользователь {surname} {name} заблокировал бота, но изменения прошли успешно и нужные данные зафиксированы в базе данных.")
+        await callback.message.edit_text(f"Пользователь {surname} {name} заблокировал бота, "
+                                         f"но изменения прошли успешно и нужные данные зафиксированы в базе данных.")
     global ADMINS
     ADMINS = find_admin() # обновление списка админов, в случае если права какого-то пользователя были изменены
 
@@ -217,7 +225,8 @@ async def send_link() -> bot:
                     callback_data="answer 0 0"
                 )]
             ]
-            await bot.send_message(chat_id=user_id, text=f"Ссылка на форму: \n\n{get_last_link()}", reply_markup=InlineKeyboardMarkup(inline_keyboard=keyboard))
+            await bot.send_message(chat_id=user_id, text=f"Ссылка на форму: \n\n{get_last_link()}",
+                                   reply_markup=InlineKeyboardMarkup(inline_keyboard=keyboard))
         except Exception as e:
             print("пользователь заблокировал бота")
             print(e)
@@ -226,12 +235,14 @@ async def send_link() -> bot:
 # ответ, получаемый пользователем после взаимодействия с инлайн клавиатурой
 @dp.callback_query(F.data.startswith("answer"))
 async def form_answer(callback: CallbackQuery):
-    await callback.message.edit_text(f"Ссылка на форму: \n\n{get_last_link()}. \n\n Вы выбрали вариант: {callback.data}")
+    await callback.message.edit_text(f"Ссылка на форму: \n\n{get_last_link()}. "
+                                     f"\n\n Вы выбрали вариант: {callback.data}")
 
 
 # главная функция
 async def main():
-    scheduler.add_job(send_link, trigger='cron', day_of_week='fri', hour='9', minute='13', timezone='Europe/Moscow') #устанавливаем время, в которое срабатывает функция отправки ссылки
+    scheduler.add_job(send_link, trigger='cron', day_of_week='fri', hour='9', minute='13',
+                      timezone='Europe/Moscow') #устанавливаем время, в которое срабатывает функция отправки ссылки
     scheduler.start()
     await dp.start_polling(bot)
 
