@@ -1,5 +1,8 @@
 import os
+from datetime import timezone
+
 from dotenv import load_dotenv
+import asyncio
 
 from aiogram import Bot, Dispatcher
 from aiogram.filters import Command, StateFilter
@@ -7,6 +10,7 @@ from aiogram.types import Message, InlineKeyboardButton, InlineKeyboardMarkup, C
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm import state
 from aiogram.fsm.state import default_state, State, StatesGroup
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from work_with_users_data import *
 from create_database import init_db
@@ -18,6 +22,8 @@ ADMINS = find_admin()
 
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
+
+scheduler = AsyncIOScheduler(timezone="Europe/Moscow")
 
 
 class FSMFill(StatesGroup):
@@ -78,7 +84,8 @@ async def add_link_command(message: Message, state: FSMContext):
 async def process_add_link1(message: Message, state: FSMContext):
     await state.update_data(link1=message.text)
     #await message.answer('Ссылка сохранена ' + message.text)
-    await message.answer(f'Ссылка на гугл форму сохранена! {message.text} \n\nТеперь вставьте ссылку на таблицу с ответами для этой формы:')
+    add_link_db("date", message.text)
+    await message.answer(f'Ссылка на гугл форму сохранена!')
     await state.clear()
     #await state.set_state(FSMFill.fill_link2)
 
