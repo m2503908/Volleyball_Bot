@@ -2,7 +2,7 @@ import sqlite3
 from create_database import DB_PATH
 
 
-def add_user(username: str, surname: str, name: str, telegram_id: str, subscribe=int(0), admin=int(0)) -> bool:
+def add_user(username: str, surname: str, name: str, telegram_id: int, subscribe=int(0), admin=int(0)) -> bool:
     """
     Функция add_user добавляет пользователя в бд, в таблицу users
     :param username: ник в телеграм пользователя
@@ -263,7 +263,7 @@ def update_surname_name(new_surname: str, new_name: str, username: str) -> bool:
     return updated
 
 
-def change_rights(surname: str, name: str, role: str, flag: int) -> bool:
+def change_rights(surname: str, name: str, role: str, flag: str) -> bool:
     """
     Функция change_rights изменяет значение subsscribe или admin на значение переменной flag (0 или 1) для указанного пользователя
     :param surname: Фамилия пользователя
