@@ -286,3 +286,21 @@ def change_rights(surname: str, name: str, role: str, flag: str) -> bool:
     conn.close()
 
     return updated
+
+
+def update_friday_saturday(friday, saturday):
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        UPDATE links
+        SET friday = friday + ?,
+            saturday = saturday + ?
+        WHERE id = (SELECT MAX(id) FROM links)
+    """, (friday, saturday))
+
+    conn.commit()
+    updated = cursor.rowcount > 0
+    conn.close()
+
+    return updated
