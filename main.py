@@ -108,8 +108,14 @@ async def process_add_link2(message: Message, state: FSMContext):
     await state.clear()"""
 
 
-# функция для формирования внутренней клавиатуры, в которой можно будет выбрать фамилию и имя пользователя, права которого мы хоти м изменить
-def surname_name_keyboard(surnames_names, role):
+def surname_name_keyboard(surnames_names: list, role: str) -> InlineKeyboardMarkup:
+    """
+    Функция surname_name_keyboard получает на вход список имен и роль, которая будет присваиваться
+    одному из пользователей. На выходе формируется инлайн клавиатура, чтобы в дальнейшем выбирать одну из фамилий.
+    :param surnames_names: список из имен и фамилий для формирования инлайн клавиатуры
+    :param role: строка с ролью. admin или subscribe
+    :return: объект типа InlineKeyboardMarkup для формирования клавиатуры в дальнейшем
+    """
     keyboard = []
 
     for surname_name in surnames_names:
@@ -186,7 +192,11 @@ async def process_change_rights3(callback: CallbackQuery, state: FSMContext):
 
 
 # функция, отвечающая за отправку сообщения с ссылкой на гугл форму
-async def send_link():
+async def send_link() -> bot:
+    """
+    Функция send_link высылает всем пользователям с subscribe = 1 ссылку на форму в определенное время
+    :return: отправляет сообщения каждому пользователю из бд с subscribe = 1
+    """
     for user_id in find_subscribe():
         try: # try-except на случай, если какой-то пользователь заблокировал бота
             keyboard = [ # создание шаблона инлайн клавиатуры
