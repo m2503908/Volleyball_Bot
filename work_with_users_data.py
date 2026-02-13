@@ -36,6 +36,23 @@ def add_link_db(date, link):
     conn.close()
 
 
+def get_last_link():
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT form_link
+        FROM links
+        ORDER BY id
+        DESC LIMIT 1
+    """)
+
+    result = cursor.fetchone()
+    conn.close()
+
+    return result[0]
+
+
 def find_admin():
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
