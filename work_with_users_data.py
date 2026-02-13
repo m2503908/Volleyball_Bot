@@ -288,7 +288,13 @@ def change_rights(surname: str, name: str, role: str, flag: str) -> bool:
     return updated
 
 
-def update_friday_saturday(friday, saturday):
+def update_friday_saturday(friday: str, saturday: str) -> bool:
+    """
+    Функция update_friday_saturday меняет значения в соответствующих колонках таблицы links
+    :param friday: как изменить значение в колонке friday, обычно 0 или 1
+    :param saturday: как изменить значение в колонке saturday, обычно 0 или 1
+    :return: меняет саму бд; True/False для проверки
+    """
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
