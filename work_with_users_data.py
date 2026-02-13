@@ -52,6 +52,23 @@ def find_admin():
     return [row[0] for row in result]
 
 
+
+def find_subscribe():
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT telegram_id
+        FROM users
+        WHERE subscribe = 1
+    """)
+
+    result = cursor.fetchall()
+    conn.close()
+
+    return [row[0] for row in result]
+
+
 def get_surname_name():
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
