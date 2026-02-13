@@ -1,5 +1,4 @@
 import os
-import time
 from datetime import timezone
 
 from dotenv import load_dotenv
