@@ -4,6 +4,10 @@ DB_PATH = "users.db"
 
 
 def init_db():
+    """
+    Функция init_db создает базу данных
+    :return: ничего не возвращает, лишь создает users.db
+    """
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
