@@ -232,9 +232,11 @@ async def send_link() -> bot:
             print(e)
 
 
-# ответ, получаемый пользователем после взаимодействия с инлайн клавиатурой
+# ответ, получаемый пользователем после взаимодействия с инлайн клавиатурой, обрабатывается и меняет бд
 @dp.callback_query(F.data.startswith("answer"))
 async def form_answer(callback: CallbackQuery):
+    answer, friday, saturday = callback.data.split()
+    update_friday_saturday(friday, saturday)
     await callback.message.edit_text(f"Ссылка на форму: \n\n{get_last_link()}. "
                                      f"\n\n Вы выбрали вариант: {callback.data}")
 
