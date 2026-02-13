@@ -23,7 +23,9 @@ def init_db():
         CREATE TABLE IF NOT EXISTS links (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         date TEXT,
-        form_link TEXT
+        form_link TEXT,
+        friday INTEGER,
+        saturday INTEGER
     )
     """)
 
@@ -31,3 +33,4 @@ def init_db():
     conn.close()
 
 init_db()
+
