@@ -1,10 +1,11 @@
 import os
+import time
 from datetime import timezone
 
 from dotenv import load_dotenv
 import asyncio
 
-from aiogram import Bot, Dispatcher
+from aiogram import Bot, Dispatcher, F
 from aiogram.filters import Command, StateFilter
 from aiogram.types import Message, InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery
 from aiogram.fsm.context import FSMContext
@@ -33,6 +34,7 @@ class FSMFill(StatesGroup):
     fill_surname = State()
     fill_role = State()
     fill_flag = State()
+    fill_form_answer = State()
 
 
 @dp.message(Command(commands="start"), StateFilter(default_state))
@@ -171,13 +173,37 @@ async def process_change_rights3(callback: CallbackQuery, state: FSMContext):
 async def send_link():
     for user_id in find_subscribe():
         try:
-            await bot.send_message(chat_id=user_id, text="Ссылка на форму:")
+            keyboard = [
+                [InlineKeyboardButton(
+                    text="Буду в пт",
+                    callback_data="answer 1 0"
+                )],
+                [InlineKeyboardButton(
+                    text="Буду в сб",
+                    callback_data="answer 0 1"
+                )],
+                [InlineKeyboardButton(
+                    text="Буду и в пт, и в сб",
+                    callback_data="answer 1 1"
+                )],
+                [InlineKeyboardButton(
+                    text="Меня не будет",
+                    callback_data="answer 0 0"
+                )]
+            ]
+            await bot.send_message(chat_id=user_id, text=f"Ссылка на форму: \n\n{get_last_link()}", reply_markup=InlineKeyboardMarkup(inline_keyboard=keyboard))
         except Exception as e:
             print("пользователь заблокировал бота")
+            print(e)
+
+
+@dp.callback_query(F.data.startswith("answer"))
+async def form_answer(callback: CallbackQuery):
+    await callback.message.edit_text(f"Ссылка на форму: \n\n{get_last_link()}. \n\n Вы выбрали вариант: {callback.data}")
 
 
 async def main():
-    scheduler.add_job(send_link, trigger='cron', day_of_week='fri', hour='8', minute=15, timezone='Europe/Moscow')
+    scheduler.add_job(send_link, trigger='cron', day_of_week='fri', hour='9', minute='13', timezone='Europe/Moscow')
     scheduler.start()
     await dp.start_polling(bot)
 
