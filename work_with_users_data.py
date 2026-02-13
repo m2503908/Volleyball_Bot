@@ -28,7 +28,7 @@ def add_link_db(date, link):
     cursor = conn.cursor()
 
     cursor.execute("""
-        INSERT INTO links (date, link) 
+        INSERT INTO links (date, form_link) 
         VALUES (?, ?)
     """, (date, link))
 
