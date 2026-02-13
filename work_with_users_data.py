@@ -23,14 +23,14 @@ def add_user(username, surname, name, telegram_id, subscribe=0, admin=0):
         conn.close()
 
 
-def add_link_db(date, link):
+def add_link_db(date, link, friday, saturday):
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
     cursor.execute("""
-        INSERT INTO links (date, form_link) 
+        INSERT INTO links (date, form_link, friday, saturday) 
         VALUES (?, ?)
-    """, (date, link))
+    """, (date, link, friday, saturday))
 
     conn.commit()
     conn.close()
