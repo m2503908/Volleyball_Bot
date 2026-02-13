@@ -89,6 +89,7 @@ async def process_add_link1(message: Message, state: FSMContext):
     await state.clear()
     #await state.set_state(FSMFill.fill_link2)
 
+
 """@dp.message(StateFilter(FSMFill.fill_link2))
 async def process_add_link2(message: Message, state: FSMContext):
     await state.update_data(link2=message.text)
@@ -154,6 +155,7 @@ async def process_change_rights2(callback: CallbackQuery, state: FSMContext):
     await callback.message.edit_text("Выберите фамилию и имя пользователя, которому хотите добавить роль:", reply_markup=surname_name_keyboard(surnames_names, callback.data))
     await state.set_state(FSMFill.fill_surname)
 
+
 @dp.callback_query(StateFilter(FSMFill.fill_surname))
 async def process_change_rights3(callback: CallbackQuery, state: FSMContext):
     surname, name, role, flag = callback.data.split()
@@ -166,5 +168,19 @@ async def process_change_rights3(callback: CallbackQuery, state: FSMContext):
         await callback.message.edit_text(f"Пользователь {surname} {name} заблокировал бота, но изменения прошли успешно и нужные данные зафиксированы в базе данных.")
 
 
+async def send_link():
+    for user_id in find_subscribe():
+        try:
+            await bot.send_message(chat_id=user_id, text="Ссылка на форму:")
+        except Exception as e:
+            print("пользователь заблокировал бота")
+
+
+async def main():
+    scheduler.add_job(send_link, trigger='cron', day_of_week='fri', hour='8', minute=15, timezone='Europe/Moscow')
+    scheduler.start()
+    await dp.start_polling(bot)
+
+
 if __name__ == '__main__':
-    dp.run_polling(bot)
+    asyncio.run(main())
