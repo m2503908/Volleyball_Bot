@@ -85,7 +85,7 @@ async def add_link_command(message: Message, state: FSMContext):
 async def process_add_link1(message: Message, state: FSMContext):
     await state.update_data(link1=message.text)
     #await message.answer('Ссылка сохранена ' + message.text)
-    add_link_db("date", message.text)
+    add_link_db("date", message.text, 0, 0)
     await message.answer(f'Ссылка на гугл форму сохранена!')
     await state.clear()
     #await state.set_state(FSMFill.fill_link2)
